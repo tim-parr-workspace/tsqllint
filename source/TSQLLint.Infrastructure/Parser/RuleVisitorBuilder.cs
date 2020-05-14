@@ -37,7 +37,7 @@ namespace TSQLLint.Infrastructure.Parser
 
             var configuredVisitors = new List<TSqlFragmentVisitor>();
 
-            var rulesList = RuleVisitorFriendlyNameTypeMap.List.Concat(pluginHandler.Rules);
+            var rulesList = RuleVisitorFriendlyNameTypeMap.List.Concat(pluginHandler?.Rules ?? new Dictionary<string, Type>());
 
             foreach (var visitor in rulesList)
             {
