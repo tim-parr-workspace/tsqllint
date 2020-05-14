@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using TSQLLint.Core.Interfaces;
 
-namespace TSQLLintCustomRules
+namespace TSQLLint.CustomRules
 {
     public class MissingWhereRule : TSqlFragmentVisitor, ISqlRule
     {

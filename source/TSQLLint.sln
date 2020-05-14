@@ -31,7 +31,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TSQLLint.Infrastructure", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TSQLLint.Core", "TSQLLint.Core\TSQLLint.Core.csproj", "{28E4C305-8BEC-4CF1-A5EE-D6624DE66154}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TSQLLintCustomRules", "TSQLLintCustomRules\TSQLLintCustomRules.csproj", "{5B8817BE-E0B7-4E9B-95ED-A84642D8CBF2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TSQLLint.CustomRules", "TSQLLintCustomRules\TSQLLint.CustomRules.csproj", "{5B8817BE-E0B7-4E9B-95ED-A84642D8CBF2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

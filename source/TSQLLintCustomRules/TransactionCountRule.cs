@@ -4,7 +4,7 @@ using System.Linq;
 using Microsoft.SqlServer.TransactSql.ScriptDom;
 using TSQLLint.Core.Interfaces;
 
-namespace TSQLLintCustomRules
+namespace TSQLLint.CustomRules
 {
     public class TransactionCountRule : TSqlFragmentVisitor, ISqlRule
     {
