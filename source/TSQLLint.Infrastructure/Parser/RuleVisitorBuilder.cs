@@ -14,12 +14,18 @@ namespace TSQLLint.Infrastructure.Parser
     {
         private readonly IReporter reporter;
         private readonly IConfigReader configReader;
+        private readonly IPluginHandler pluginHandler;
         private bool errorLogged;
 
         public RuleVisitorBuilder(IConfigReader configReader, IReporter reporter)
         {
             this.reporter = reporter;
             this.configReader = configReader;
+        }
+
+        public RuleVisitorBuilder(IConfigReader configReader, IReporter reporter, IPluginHandler pluginHandler) : this(configReader, reporter)
+        {
+            this.pluginHandler = pluginHandler;
         }
 
         public List<TSqlFragmentVisitor> BuildVisitors(string sqlPath, IEnumerable<IRuleException> ignoredRules)
@@ -31,7 +37,9 @@ namespace TSQLLint.Infrastructure.Parser
 
             var configuredVisitors = new List<TSqlFragmentVisitor>();
 
-            foreach (var visitor in RuleVisitorFriendlyNameTypeMap.List)
+            var rulesList = RuleVisitorFriendlyNameTypeMap.List.Concat(pluginHandler.Rules);
+
+            foreach (var visitor in rulesList)
             {
                 var visitorInstance = (ISqlRule)Activator.CreateInstance(
                     visitor.Value,

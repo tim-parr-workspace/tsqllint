@@ -1,3 +1,4 @@
+using Microsoft.SqlServer.TransactSql.ScriptDom;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -16,6 +17,7 @@ namespace TSQLLint.Infrastructure.Plugins
         private readonly IFileSystem fileSystem;
         private readonly IFileversionWrapper versionWrapper;
         private Dictionary<Type, IPlugin> plugins;
+        private Dictionary<Type, ISqlRule> customRules;
 
         public PluginHandler(IReporter reporter)
             : this(reporter, new FileSystem(), new AssemblyWrapper(), new VersionInfoWrapper()) { }
@@ -31,6 +33,10 @@ namespace TSQLLint.Infrastructure.Plugins
         public IList<IPlugin> Plugins => plugins.Values.ToList();
 
         private Dictionary<Type, IPlugin> List => plugins ?? (plugins = new Dictionary<Type, IPlugin>());
+
+        private Dictionary<Type, ISqlRule> CustomRules => customRules ?? (customRules = new Dictionary<Type, ISqlRule>());
+
+        public Dictionary<string, Type> Rules => CustomRules.Select(x => (x.Key.Name, Value: x.Key)).ToDictionary(y => y.Name, y => y.Value);
 
         public void ProcessPaths(Dictionary<string, string> pluginPaths)
         {
@@ -60,6 +66,7 @@ namespace TSQLLint.Infrastructure.Plugins
             else
             {
                 LoadPlugin(path);
+                LoadCustomRules(path);
             }
         }
 
@@ -75,6 +82,7 @@ namespace TSQLLint.Infrastructure.Plugins
             foreach (var entry in fileEntries)
             {
                 LoadPlugin(entry);
+                LoadCustomRules(entry);
             }
         }
 
@@ -115,6 +123,39 @@ namespace TSQLLint.Infrastructure.Plugins
                 {
                     reporter.Report($"There was a problem with plugin: {plugin.Key} - {exception.Message}");
                     Trace.WriteLine(exception);
+                }
+            }
+        }
+
+        public void LoadCustomRules(string assemblyPath)
+        {
+            var path = fileSystem.Path.GetFullPath(assemblyPath);
+            var dll = assemblyWrapper.LoadFile(path);
+            var types = assemblyWrapper.GetExportedTypes(dll);
+
+            foreach (var type in types)
+            {
+                if (!type.GetInterfaces().Contains(typeof(ISqlRule)) || !type.IsSubclassOf(typeof(TSqlFragmentVisitor)))
+                {
+                    continue;
+                }
+
+                try
+                {
+                    if (!CustomRules.ContainsKey(type))
+                    {
+                        CustomRules.Add(type, type as ISqlRule);
+                        var version = versionWrapper.GetVersion(dll);
+                        reporter.Report($"Loaded Rule: '{type.FullName}', Version: '{version}'");
+                    }
+                    else
+                    {
+                        reporter.Report($"Already loaded Rule with type '{type.FullName}'");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    reporter.Report(ex.Message);
                 }
             }
         }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using TSQLLint.Common;
 
@@ -6,6 +7,8 @@ namespace TSQLLint.Core.Interfaces
     public interface IPluginHandler
     {
         IList<IPlugin> Plugins { get; }
+
+        Dictionary<string, Type> Rules { get; }
 
         void ProcessPaths(Dictionary<string, string> pluginPaths);
 

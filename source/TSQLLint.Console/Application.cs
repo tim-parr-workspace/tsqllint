@@ -46,13 +46,15 @@ namespace TSQLLint.Console
         {
             configReader.LoadConfig(commandLineOptions.ConfigFile);
 
-            var fragmentBuilder = new FragmentBuilder(configReader.CompatabilityLevel);
-            var ruleVisitorBuilder = new RuleVisitorBuilder(configReader, this.reporter);
-            var ruleVisitor = new SqlRuleVisitor(ruleVisitorBuilder, fragmentBuilder, reporter);
             pluginHandler = new PluginHandler(reporter);
+            pluginHandler.ProcessPaths(configReader.GetPlugins());
+
+            var fragmentBuilder = new FragmentBuilder(configReader.CompatabilityLevel);
+            var ruleVisitorBuilder = new RuleVisitorBuilder(configReader, reporter, pluginHandler);
+            var ruleVisitor = new SqlRuleVisitor(ruleVisitorBuilder, fragmentBuilder, reporter);
+
             fileProcessor = new SqlFileProcessor(ruleVisitor, pluginHandler, reporter, new FileSystem());
 
-            pluginHandler.ProcessPaths(configReader.GetPlugins());
             var response = commandLineOptionHandler.Handle(new CommandLineRequestMessage(commandLineOptions));
             if (response.ShouldLint)
             {
